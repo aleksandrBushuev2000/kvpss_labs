@@ -1,8 +1,10 @@
-import { FormSubmitCallback } from "./FormSubmitCallback";
+import { InputPayload } from "../input/InputPayload";
 
-export class FormOptions {
+export class FormOptions<T> {
     needValidate : boolean;
     allowClickIfInvalid : boolean;
-    submitCallback : FormSubmitCallback;
+    submitCallback : (data : Array<InputPayload>) => Promise<T>;
+    successCallback : (data : T) => void;
+    errorCallback : (err : Error) => void;
     submitButtonText : string;
 }

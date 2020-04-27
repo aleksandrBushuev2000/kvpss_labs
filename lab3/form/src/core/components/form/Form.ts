@@ -1,4 +1,4 @@
-import { IRenderable } from "../IRenderable";
+import { AbstractComponent } from "../AbstractComponent";
 import { AbstractInput } from "../input/AbstractInput";
 import { FormOptions } from "./FormOptions";
 import { AbstractButton } from "../button/AbstractButton";
@@ -7,29 +7,41 @@ import { CoreEvent } from '../../events/CoreEvent';
 import { SimpleButton } from "../button/simple-button/SimpleButton";
 
 import './Form.sass';
+import { CircularLoader } from "../loaders/circular-loader/CircularLoader";
 
-export class Form implements IRenderable, EventHandler {
+
+export class Form<T> extends AbstractComponent implements EventHandler {
     private FORM_GROUP_BOOTSTRAP_CLASS = "form-group";
     private SUBMIT_BUTTON_TEXT = "Отправить";
     private SUBMIT_BUTTON_WRAPPER_CLASS = "submit-button__wrapper";
+    private INVISIBLE_CLASS = "form__component_invisible";
 
+    private FORM_SUBMIT_CLASS = "form__submit__wrapper";
 
     private formInputs : Array<AbstractInput>;
     private submitInput : AbstractButton;
-    private options : FormOptions;
-
-    private rendered : boolean;
-
-    private renderedNode : HTMLFormElement;
+    private pendingLoader : CircularLoader;
+    private options : FormOptions<T>;
     private inputsWrapper : HTMLDivElement;
 
-    constructor(options : FormOptions) {
+    private defaults = {
+        successCallback : (data : T) => {
+            console.log(data);
+        },
+        errorCallback : (err : Error) => {
+            console.error(err);
+        }
+    }
+
+    constructor(options : FormOptions<T>) {
+        super();
         this.formInputs = [];
         this.options = options;
         this.submitInput = new SimpleButton({
             buttonText : this.options.submitButtonText 
                 || this.SUBMIT_BUTTON_TEXT
         });
+        this.pendingLoader = new CircularLoader();
         this.submitInput.pushSubscriber(this);
     }
 
@@ -45,7 +57,6 @@ export class Form implements IRenderable, EventHandler {
             }
         } else if (event.name == "click" && event.target == this.submitInput) {
             this.submit();
-            console.log(event)
         }
     }
 
@@ -61,10 +72,22 @@ export class Form implements IRenderable, EventHandler {
         return true;
     }
 
+    private setNoPending() {
+        this.formInputs.forEach(el => el.setEnabled());
+        this.pendingLoader.addClass(this.INVISIBLE_CLASS);
+        this.submitInput.removeClass(this.INVISIBLE_CLASS);
+    }
+
+    private setPending() {
+        this.formInputs.forEach(el => el.setDisabled());
+        this.pendingLoader.removeClass(this.INVISIBLE_CLASS);
+        this.submitInput.addClass(this.INVISIBLE_CLASS);
+    }
+
     push(input : AbstractInput) {
         this.formInputs.push(input);
         input.pushSubscriber(this);
-        if (this.rendered) {
+        if (this.isRendered) {
             input.render(this.inputsWrapper);
         }    
     }
@@ -76,7 +99,7 @@ export class Form implements IRenderable, EventHandler {
         }
     }
 
-    render(parent : HTMLElement): void {
+    makeNode(): HTMLElement {
         const wrapper = document.createElement('form');
         wrapper.autocapitalize = "off";
         wrapper.autocomplete = "off";
@@ -87,9 +110,7 @@ export class Form implements IRenderable, EventHandler {
 
         this.formInputs.forEach(el => el.render(inputsWrapper));
 
-        this.rendered = true;
         wrapper.append(inputsWrapper);
-        parent.append(wrapper);
 
         const buttonWraper = document.createElement('div');
         buttonWraper.classList.add(this.SUBMIT_BUTTON_WRAPPER_CLASS);
@@ -97,21 +118,27 @@ export class Form implements IRenderable, EventHandler {
         this.submitInput.render(buttonWraper);
         wrapper.append(buttonWraper);
 
+        this.pendingLoader.render(wrapper);
+        this.pendingLoader.addClass(this.FORM_SUBMIT_CLASS);
+        this.submitInput.addClass(this.FORM_SUBMIT_CLASS);
+
+        this.setNoPending();
+
         this.inputsWrapper = inputsWrapper;
         this.renderedNode = wrapper;
 
+
         if (!this.options.allowClickIfInvalid && !this.checkNeedEnableButton()) {
             this.submitInput.setDisabled();
-            
         }
+
+        return wrapper;
     }
 
-    destroy(): void {
-        if (this.rendered) {
-            this.formInputs.map(el => el.destroy());
-            this.submitInput.destroy();
-            this.renderedNode.remove();
-        }
+    removeNode(): void {
+        this.formInputs.map(el => el.destroy());
+        this.submitInput.destroy();
+        this.renderedNode.remove();
     }
 
     validate() : boolean {
@@ -124,17 +151,17 @@ export class Form implements IRenderable, EventHandler {
     }
 
     submit() {
-        if (this.options.needValidate) {
-            let validationResult = this.validate();
-            if (validationResult) {
-                this.options.submitCallback(
-                    this.formInputs.map(el => el.getPayload())
-                );
-            }
-        } else {
+        const successCallback = this.options.successCallback || this.defaults.successCallback;
+        const errorCallback = this.options.errorCallback || this.defaults.errorCallback;
+        let validationResult = this.options.needValidate ? this.validate() : true;
+        if (validationResult) {
+            this.setPending();
             this.options.submitCallback(
                 this.formInputs.map(el => el.getPayload())
-            );
+            )
+            .then(successCallback)
+            .catch(errorCallback)
+            .finally(() => this.setNoPending());
         }
     }
     

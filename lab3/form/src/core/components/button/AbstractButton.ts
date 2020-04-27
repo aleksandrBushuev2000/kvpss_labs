@@ -1,8 +1,9 @@
 import { ButtonOptions } from "./ButtonOptions";
 import { IRenderable } from "../IRenderable";
 import { EventEmitter } from "../../events/EventEmitter";
+import { AbstractEmitterComponent } from "../AbstractEmitterComponent";
 
-export abstract class AbstractButton extends EventEmitter implements IRenderable {
+export abstract class AbstractButton extends AbstractEmitterComponent {
     protected rendered : boolean;
     protected renderedNode : HTMLElement;
     protected options : ButtonOptions;
@@ -12,17 +13,8 @@ export abstract class AbstractButton extends EventEmitter implements IRenderable
         this.options = options;
     }
 
-    abstract destroy() : void;
     abstract setDisabled() : void;
     abstract setEnabled() : void;
 
     abstract makeNode() : HTMLElement;
-
-    render(parent : HTMLElement): void {
-        this.renderedNode = this.makeNode();
-        parent.append(this.renderedNode);
-        this.rendered = true;
-    }
-
-
 }

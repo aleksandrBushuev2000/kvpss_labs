@@ -18,13 +18,11 @@ export class SimpleButton extends AbstractButton {
         this.state.disabled = false;
     }
 
-    destroy(): void {
-        if (this.rendered) {
-            this.button.onclick = null; 
-            this.renderedNode.remove();
-        }
+    removeNode() {
+        this.button.onclick = null; 
+        this.renderedNode.remove();
     }
-
+    
     setDisabled() {
         this.state.disabled = true;
         this.button.disabled = this.state.disabled;
@@ -48,7 +46,7 @@ export class SimpleButton extends AbstractButton {
             ev.name = "click";
             ev.data = null;
             ev.target = this;
-            this.subscribers.forEach(sub => sub.handleEvent(ev));
+            this.emitEvent(ev);
         };
 
         this.button = button;

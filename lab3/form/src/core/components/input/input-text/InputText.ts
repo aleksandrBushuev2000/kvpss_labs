@@ -45,6 +45,17 @@ export class InputText extends AbstractInput {
         this.isTextarea = options.inputType == 'textarea';
     }
 
+    public setDisabled() {
+        if (this.isRendered)
+            (<HTMLInputElement>this.importantHtmlElements.get(this.TEXT_INPUT_MAP_NAME)).disabled = true;
+    }
+
+    public setEnabled() {
+        if (this.isRendered) {
+            (<HTMLInputElement>this.importantHtmlElements.get(this.TEXT_INPUT_MAP_NAME)).disabled = false;
+        }
+    }
+
     public getPayload() {
         return new InputPayload(this.state.input, this.options.inputName);
     }
@@ -127,9 +138,7 @@ export class InputText extends AbstractInput {
         return event;
     }
 
-    protected makeNode() : HTMLElement {
-        super.makeNode();
-
+    makeNode() : HTMLElement {
         const divWrapper = document.createElement("div");
         if (this.options.inputId) {
             divWrapper.id = this.options.inputId;
@@ -196,14 +205,11 @@ export class InputText extends AbstractInput {
         return new InputValidationObject(true, "");
     }
 
-    destroy() : void {
-        if (this.rendered) {
-            const textInput = this.importantHtmlElements.get(this.TEXT_INPUT_MAP_NAME);
-            textInput.oninput = null;
-            textInput.onfocus = null;
-            textInput.onblur = null;
-            this.renderedNode.remove();
-        }
+    removeNode() {
+        const textInput = this.importantHtmlElements.get(this.TEXT_INPUT_MAP_NAME);
+        textInput.oninput = null;
+        textInput.onfocus = null;
+        textInput.onblur = null;
+        this.renderedNode.remove();
     }
-
 }
