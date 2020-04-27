@@ -25,12 +25,6 @@ module.exports = {
             'sass-loader'
         ]
       },
-      {
-        test: /\.html$/,
-        loaders : [
-            'html-loader'
-        ]
-      },
     ]
   },
   resolve: {
@@ -39,7 +33,6 @@ module.exports = {
   plugins : [
       new MiniCssExtractPlugin(),
       new HtmlWebpackPlugin({
-        title : "3.1 Форма",
         template : "./src/index.html"
       })
   ]
