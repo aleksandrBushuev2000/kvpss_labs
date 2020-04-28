@@ -1,13 +1,14 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   entry: [
     './src/index.ts',
   ],
   output: {
-    filename: './app.bundle.js'
+    filename: './js/app.bundle.js'
   },
   devtool: "source-map",
   module: {
@@ -31,7 +32,8 @@ module.exports = {
     extensions: [ '.ts', '.js' ],
   },
   plugins : [
-      new MiniCssExtractPlugin(),
+      new CleanWebpackPlugin(),
+      new MiniCssExtractPlugin({filename : "./css/main.css"}),
       new HtmlWebpackPlugin({
         template : "./src/index.html"
       })
