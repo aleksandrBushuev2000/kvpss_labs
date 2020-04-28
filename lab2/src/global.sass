@@ -1,9 +1,101 @@
-@import "~bootstrap/scss/bootstrap"
+@import "./sass/navbar"
+@import "./sass/carousel"
 
+a
+    text-decoration: none
+    outline: none
+    
 body
+    font-family: Arial, Helvetica, sans-serif
+    margin: 0
+    padding: 0
     height: 100vh
+    overflow-x: hidden
+
+.success-btn
+    display: inline-block
+    font-weight: 400
+    color: #fff
+    background-color: #28a745
+    border-color: #28a745
+    text-align: center
+    vertical-align: middle
+    cursor: pointer
+    user-select: none
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: .25rem;
+    transition: all 0.15s ease-in-out
+
+.success-btn:hover
+    color: #fff;
+    background-color: #1e7e34;
+    border-color: #1c7430;
+
+.flex-container-main
+    display: flex
+    flex-flow: row wrap
+    justify-content: safe center
+    align-content: flex-start
+
+.card:hover
+    box-shadow: 0px 3px 5px -1px
+
+.section-header
+    text-align: center
+    width: 100vw
+    font-size: 32px
+    margin-top: 1%
+
+.card
+    padding: 10px
+    margin: 1%
+    display: flex
+    flex-flow: column nowrap
+    border-radius: 5px
+    box-shadow: 0px 3px 3px -2px
+
+    @media screen and ( max-width: 650px )
+        width: 85%
+
+    @media screen and ( min-width: 651px )
+        width: 70%
+    
+    @media screen and ( min-width: 700px )
+        width: 35%
+
+    @media screen and ( min-width: 960px )
+        width: 35%
+
+    @media screen and ( min-width: 1280px )
+        width: 25%
+
+
+    .card-img-section
+        align-self: center
+        width: 95%
+        height: auto
+        margin: 5px
+
+        img
+            width: 100%
+            height: 100%
+        
+    .card-body
+        padding: 10px
+
+    .card-title
+        font-size: 16px
+        font-weight: bold
 
 footer
+    min-height: 50px
+    display: flex
+    flex-flow: row nowrap
+    align-items: center
+    justify-content: center
+
     background-color: #524949
     color: #c7c0c0
 
