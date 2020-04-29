@@ -1,13 +1,20 @@
 export class Navbar {
-    constructor(header) {
-        this.navbarButton = header.getElementsByClassName("navbar-btn")[0];
-        this.desktopNavbar = header.getElementsByClassName("navbar")[0];
-        this.mobileNavbar = header.getElementsByClassName("navbar-mobile")[0];
+
+    private navbarButton : HTMLDivElement;
+    private desktopNavbar : HTMLDivElement;
+    private mobileNavbar : HTMLDivElement;
+
+    private isMobileNavbarOpen : boolean;
+
+    private HIDDEN_MOBILE_NAVBAR : string = "navbar-hidden";
+    private OPEN_BUTTON : string = "open";
+
+    constructor(header : HTMLDivElement) {
+        this.navbarButton = header.querySelector("div.navbar-btn");
+        this.desktopNavbar = header.querySelector("nav.navbar");
+        this.mobileNavbar = header.querySelector("nav.navbar-mobile");
 
         this.isMobileNavbarOpen = false;
-
-        this.HIDDEN_MOBILE_NAVBAR = "navbar-hidden";
-        this.OPEN_BUTTON = "open";
     }
 
     navbarButtonClickEventHandler() {

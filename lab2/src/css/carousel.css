@@ -1,0 +1,113 @@
+.carousel-wrapper {
+    height: 30vw;
+    width: 100vw;
+    position: relative;
+};
+
+.carousel-wrapper > .carousel-items {
+    position: relative;
+    z-index: 500;
+}
+
+.carousel-wrapper > .carousel-items > div.carousel-item {
+    position: absolute;
+    transition: transform 0.3s ease-in-out;
+    transform: translateX(100vw);
+    visibility: hidden;
+}
+
+.carousel-wrapper > .carousel-items > div > img {
+    width: 100vw;
+    height: 30vw;
+}
+            
+div.carousel-initial-item {
+    transform: none!important;
+    visibility: visible!important;
+}
+
+div.carousel-item-prev {
+    visibility: visible!important;
+    transition: transform .3s ease-in-out;
+    transform: translateX(-100vw)!important;
+}
+
+div.carousel-item-active {
+    visibility: visible!important;
+    transition: transform .3s ease-in-out;
+    transform: translateX(0)!important;
+}
+
+div.carousel-item-reverse-prev {
+    visibility: visible!important;
+    transition: transform 0.3s ease-in-out!important;
+    transform: translateX(100vw)!important;
+}
+
+div.carousel-item-before-reverse-active {
+    transition: none!important;
+    transform: translateX(-100vw)!important;
+}
+
+div.carousel-item-reverse-active {
+    visibility: visible!important;
+    transform: translateX(0)!important;
+}
+
+div.carousel-controls-wrapper {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: flex-end;
+    z-index: 1000;
+    width: 100vw;
+    height: 25vw;
+}
+
+div.carousel-control {
+    width: 4%;
+    height: 1.5%;
+    position: relative;
+    top: 8%;
+    background-color: rgb(48, 37, 37);
+    margin-left: 2%;
+    margin-right: 2%;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+div.carousel-control:hover {
+    background-color: rgb(228, 222, 222);
+}
+
+div.carousel-control-active {
+    background-color: grey!important;
+}
+
+.carousel-control-icon {
+  z-index: 1000;
+  font-size: 5rem;
+  color: rgb(51, 40, 40);
+  cursor: pointer;
+}
+
+.carousel-control-icon:hover {
+    color: whitesmoke;
+}
+
+.carousel-control-icon-left {
+    position: absolute;
+    top: 40%;
+    left: 5%;
+}
+
+.carousel-control-icon-right {
+    position: absolute;
+    top: 40%;
+    right: 5%;
+}
