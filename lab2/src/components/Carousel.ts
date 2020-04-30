@@ -62,6 +62,8 @@ export class Carousel {
         this.needSetInterval = true;
         this.tickIntervalNumber = tickInterval;
 
+        window.addEventListener('blur', this.mouseOverListener.bind(this));
+        window.addEventListener('focus', this.mouseOutListener.bind(this));
         carouselContainer.onmouseover = this.mouseOverListener.bind(this);
         carouselContainer.onmouseout = this.mouseOutListener.bind(this);
     }
