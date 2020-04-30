@@ -11,7 +11,6 @@
 
 .carousel-wrapper > .carousel-items > div.carousel-item {
     position: absolute;
-    transition: transform 0.3s ease-in-out;
     transform: translateX(100vw);
     visibility: hidden;
 }
@@ -27,20 +26,20 @@ div.carousel-initial-item {
 }
 
 div.carousel-item-prev {
+    transition: transform 0.6s ease;
     visibility: visible!important;
-    transition: transform .3s ease-in-out;
     transform: translateX(-100vw)!important;
 }
 
 div.carousel-item-active {
+    transition: transform 0.6s ease;
     visibility: visible!important;
-    transition: transform .3s ease-in-out;
     transform: translateX(0)!important;
 }
 
 div.carousel-item-reverse-prev {
     visibility: visible!important;
-    transition: transform 0.3s ease-in-out!important;
+    transition: transform 0.6s ease!important;
     transform: translateX(100vw)!important;
 }
 
@@ -50,6 +49,7 @@ div.carousel-item-before-reverse-active {
 }
 
 div.carousel-item-reverse-active {
+    transition: transform 0.6s ease;
     visibility: visible!important;
     transform: translateX(0)!important;
 }
@@ -91,10 +91,19 @@ div.carousel-control-active {
 
 .carousel-control-icon {
   z-index: 1000;
-  font-size: 5rem;
-  color: rgb(51, 40, 40);
   cursor: pointer;
+  width: 40px;
+  height: 40px;
 }
+
+.carousel-control-icon svg {
+    fill: gainsboro;
+}
+
+.carousel-control-icon svg:hover {
+    fill: gray;
+}
+
 
 .carousel-control-icon:hover {
     color: whitesmoke;
@@ -104,12 +113,16 @@ div.carousel-control-active {
     position: absolute;
     top: 40%;
     left: 5%;
+    display: flex;
+    justify-content: flex-start;
 }
 
 .carousel-control-icon-right {
     position: absolute;
     top: 40%;
     right: 5%;
+    display: flex;
+    justify-content: flex-end;
 }
 #nav-header {
     background-color: #524949;

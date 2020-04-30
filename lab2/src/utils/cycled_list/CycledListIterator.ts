@@ -13,10 +13,6 @@ export class CycledListIterator<T> {
         return this.current.getData();
     }
 
-    peekPrevPrev() {
-        return this.current.getPrev().getPrev();
-    }
-
     peekNext() {
         return this.current.getNext().getData();
     }

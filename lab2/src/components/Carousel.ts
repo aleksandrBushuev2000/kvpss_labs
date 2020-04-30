@@ -2,6 +2,8 @@ import { CycledList } from '../utils/cycled_list/CycledList';
 import { CycledListIterator } from '../utils/cycled_list/CycledListIterator';
 import { sleep } from '../utils/sleep/sleep';
 
+import { mdiArrowLeftDropCircle, mdiArrowRightDropCircle } from '@mdi/js';
+
 class CarouselSlide {
     private image : HTMLDivElement;
     private control : HTMLDivElement;
@@ -47,12 +49,31 @@ export class Carousel {
 
     private BAD_SLIDES_COUNT = "Slides count shoud be > 1";
 
+    private isAnimationPending : boolean;
+
+    private needSetInterval : boolean;
+
     constructor(carouselContainer : HTMLDivElement, tickInterval : number) {
         this.carouselList = new CycledList<CarouselSlide>();
         this.makeCarouselSlides(carouselContainer);
         this.iterator = this.carouselList.createIterator();
 
+        this.isAnimationPending = false;
+        this.needSetInterval = true;
         this.tickIntervalNumber = tickInterval;
+
+        carouselContainer.onmouseover = this.mouseOverListener.bind(this);
+        carouselContainer.onmouseout = this.mouseOutListener.bind(this);
+    }
+
+    private mouseOverListener(ev : Event) {
+        this.needSetInterval = false;
+        clearInterval(this.tickInterval);
+    }
+
+    private mouseOutListener(ev : Event) {
+        this.needSetInterval = true;
+        this.setInterval();
     }
 
     private async controlClickListener(clickedSlide : CarouselSlide) {
@@ -68,39 +89,96 @@ export class Carousel {
                 this.iterator.next();
             }
 
+            const activeImage = active.getImage();
+            const currentImage = current.getImage();
+
             if (active.getIndex() < current.getIndex()) {
                 active.getImage().className = this.BEFORE_REVERSE_ACTIVE;
                 await sleep(15);
 
-                active.getImage().className = this.REVERSE_ACTIVE;
-                current.getImage().className = this.REVERSE_PREV;  
+                activeImage.className = this.REVERSE_ACTIVE;
+                currentImage.className = this.REVERSE_PREV;  
             } else {
-                current.getImage().className = this.PREV;
-                active.getImage().className = this.CURRENT;
+                currentImage.className = this.PREV;
+                activeImage.className = this.CURRENT;
             }
-
-            this.tickInterval = setInterval(() => this.tick(), this.tickIntervalNumber);
+            this.setInterval();
         }
       
+    }
+
+    private bindCarouselSlides(slides : NodeListOf<HTMLDivElement>, controls : Array<HTMLDivElement>) {
+        for (let i = 0; i < slides.length; i++) {
+            let slide = slides[i];
+            let index = i;
+            let controlListItem = new CarouselSlide(slide, controls[index], index)
+            this.carouselList.push(controlListItem);
+            controls[index].onclick = (ev) => {
+                this.controlClickListener(controlListItem);
+            }
+
+            slides[i].addEventListener('transitionstart',(ev) => {
+                this.isAnimationPending = true;
+            });
+
+            slides[i].ontransitionend = (ev) => {
+                this.transitionEndHandler(slides[i]);
+            }
+        }
+    }
+
+    private createControlsArray(slides : NodeListOf<HTMLDivElement>) : Array<HTMLDivElement> {
+        let controlsArray : Array<HTMLDivElement> = [];
+
+        slides.forEach(() => {
+            let control = document.createElement('div');
+            control.className = this.CAROUSEL_CONTROL_DEFAULT;
+            controlsArray.push(control);
+        })
+
+        return controlsArray;
+    }
+
+    private bindArrows(container : HTMLDivElement) {
+        let svgIcons = this.makeCarouselArrows();
+        let leftArrow = <HTMLElement>container.querySelector("div.carousel-control-icon-left");
+        leftArrow.append(svgIcons.left);
+        leftArrow.onclick = (ev) => {if (!this.isAnimationPending) this.controlClickListener(this.iterator.peekPrev())};
+        let rightArrow = <HTMLElement>container.querySelector("div.carousel-control-icon-right");
+        rightArrow.append(svgIcons.right);
+        rightArrow.onclick = (ev) => {if (!this.isAnimationPending) this.controlClickListener(this.iterator.peekNext())};
+    }
+
+    private makeCarouselArrows() {
+        const namespaceUri = "http://www.w3.org/2000/svg";
+        let leftIconSvg = document.createElementNS(namespaceUri, 'svg');
+        let pathLeft = document.createElementNS(namespaceUri, "path");
+        pathLeft.setAttributeNS(null, "d", mdiArrowLeftDropCircle);
+        leftIconSvg.append(pathLeft);
+
+        let rightIconSvg = document.createElementNS(namespaceUri, 'svg');
+        let pathRight = document.createElementNS(namespaceUri, "path");
+        pathRight.setAttributeNS(null, "d", mdiArrowRightDropCircle);
+        rightIconSvg.append(pathRight);
+
+        return {
+            left : leftIconSvg,
+            right : rightIconSvg
+        }
+
     }
 
     private makeCarouselSlides(container : HTMLDivElement) {
         let slidesContainer = <HTMLDivElement>container.querySelector("div.carousel-items");
         let slides = <NodeListOf<HTMLDivElement>>slidesContainer.querySelectorAll("div.carousel-item");
+
         if (slides.length < 2) {
             throw new Error(this.BAD_SLIDES_COUNT);
         }
 
         let controlsWrapper = document.createElement('div');
         controlsWrapper.className = this.CAROUSEL_CONTROLS_WRAPPER;
-
-        let controlsArray : Array<HTMLDivElement> = [];
-
-        slides.forEach(slide => {
-            let control = document.createElement('div');
-            control.className = this.CAROUSEL_CONTROL_DEFAULT;
-            controlsArray.push(control);
-        })
+        let controlsArray : Array<HTMLDivElement> = this.createControlsArray(slides);
         controlsWrapper.append(...controlsArray);
         slidesContainer.append(controlsWrapper);
 
@@ -113,23 +191,27 @@ export class Carousel {
                 this.controlClickListener(controlListItem);
             }
 
+            slides[i].addEventListener('transitionstart',(ev) => {
+                console.log("Start")
+                this.isAnimationPending = true;
+            });
+
             slides[i].ontransitionend = (ev) => {
                 this.transitionEndHandler(slides[i]);
             }
         }
 
-        let leftArrow = <HTMLElement>document.querySelector("div.carousel-control-icon-left");
-        leftArrow.onclick = (ev) => this.controlClickListener(this.iterator.peekPrev());
-        let rightArrow = <HTMLElement>document.querySelector("div.carousel-control-icon-right");
-        rightArrow.onclick = (ev) => this.controlClickListener(this.iterator.peekNext());
+        this.bindCarouselSlides(slides, controlsArray);
+        this.bindArrows(container);
     }
 
     private async transitionEndHandler(slide : HTMLDivElement) {
-        await sleep(150);
         if (slide.className.indexOf("active") == -1) {
             slide.className = this.NEXT;
         } if (slide.className == this.REVERSE_ACTIVE) {
             slide.className = this.CURRENT;
+        } else {
+            this.isAnimationPending = false;
         }
     }
 
@@ -142,7 +224,6 @@ export class Carousel {
         current.getImage().className = this.CURRENT;
         current.getControl().className = this.CAROUSEL_CONTROL_ACTIVE;
         prev.getControl().className = this.CAROUSEL_CONTROL_DEFAULT;
-        this.iterator.peekPrevPrev().getData().getImage().className = this.NEXT;
     }
 
     private initialTick() {
@@ -152,9 +233,14 @@ export class Carousel {
         this.iterator.peekNext().getImage().className = this.NEXT;
     }
 
+    private setInterval() : void {
+        if (this.needSetInterval)
+            this.tickInterval = setInterval(() => this.tick(), this.tickIntervalNumber);
+    }
+
     bind() {
         this.initialTick();
-        this.tickInterval = setInterval(() => this.tick(), this.tickIntervalNumber);
+        this.setInterval();
     }
 }
 

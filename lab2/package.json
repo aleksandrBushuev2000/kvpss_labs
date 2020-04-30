@@ -17,7 +17,9 @@
     "webpack-dev-server": "^3.10.3",
     "write-file-webpack-plugin": "^4.5.1"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@mdi/js": "^5.1.45"
+  },
   "scripts": {
     "build": "webpack --mode production",
     "dev": "webpack-dev-server --mode development --open"
