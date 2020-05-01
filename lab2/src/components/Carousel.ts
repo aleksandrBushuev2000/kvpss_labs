@@ -227,14 +227,7 @@ export class Carousel {
     }
 
     private tick() : void {
-        let current = this.iterator.next();
-        let next = this.iterator.peekNext();
-        let prev = this.iterator.peekPrev();
-        next.getImage().className = this.NEXT;
-        prev.getImage().className = this.PREV;
-        current.getImage().className = this.CURRENT;
-        current.getControl().className = this.CAROUSEL_CONTROL_ACTIVE;
-        prev.getControl().className = this.CAROUSEL_CONTROL_DEFAULT;
+        this.controlClickListener(this.iterator.peekNext());
     }
 
     private initialTick() {
