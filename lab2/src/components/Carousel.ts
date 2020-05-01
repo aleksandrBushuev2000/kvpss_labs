@@ -49,9 +49,17 @@ export class Carousel {
 
     private BAD_SLIDES_COUNT = "Slides count shoud be > 1";
 
+    private LEFT_ICON_SELECTOR = "div.carousel-control-icon-left";
+    private RIGHT_ICON_SELECTOR = "div.carousel-control-icon-right"
+
+    private CAROUSEL_ARROW_LEFT = mdiArrowLeftDropCircle;
+    private CAROUSEL_ARROW_RIGHT = mdiArrowRightDropCircle;
+
     private isAnimationPending : boolean;
 
     private needSetInterval : boolean;
+
+    private SVG_NAMESPACE_URI = "http://www.w3.org/2000/svg";
 
     constructor(carouselContainer : HTMLDivElement, tickInterval : number) {
         this.carouselList = new CycledList<CarouselSlide>();
@@ -79,34 +87,35 @@ export class Carousel {
     }
 
     private async controlClickListener(clickedSlide : CarouselSlide) {
-        let current = this.iterator.peekCurrent();
-        if (current != clickedSlide) {
-            clearInterval(this.tickInterval);
-            let active = clickedSlide;
-
-            active.getControl().className = this.CAROUSEL_CONTROL_ACTIVE;
-            current.getControl().className = this.CAROUSEL_CONTROL_DEFAULT;
-
-            while (this.iterator.peekCurrent() != active) {
-                this.iterator.next();
+        if (!this.isAnimationPending) {
+            let current = this.iterator.peekCurrent();
+            if (current != clickedSlide) {
+                clearInterval(this.tickInterval);
+                let active = clickedSlide;
+    
+                active.getControl().className = this.CAROUSEL_CONTROL_ACTIVE;
+                current.getControl().className = this.CAROUSEL_CONTROL_DEFAULT;
+    
+                while (this.iterator.peekCurrent() != active) {
+                    this.iterator.next();
+                }
+    
+                const activeImage = active.getImage();
+                const currentImage = current.getImage();
+    
+                if (active.getIndex() < current.getIndex()) {
+                    active.getImage().className = this.BEFORE_REVERSE_ACTIVE;
+                    await sleep(15);
+    
+                    activeImage.className = this.REVERSE_ACTIVE;
+                    currentImage.className = this.REVERSE_PREV;  
+                } else {
+                    currentImage.className = this.PREV;
+                    activeImage.className = this.CURRENT;
+                }
+                this.setInterval();
             }
-
-            const activeImage = active.getImage();
-            const currentImage = current.getImage();
-
-            if (active.getIndex() < current.getIndex()) {
-                active.getImage().className = this.BEFORE_REVERSE_ACTIVE;
-                await sleep(15);
-
-                activeImage.className = this.REVERSE_ACTIVE;
-                currentImage.className = this.REVERSE_PREV;  
-            } else {
-                currentImage.className = this.PREV;
-                activeImage.className = this.CURRENT;
-            }
-            this.setInterval();
         }
-      
     }
 
     private bindCarouselSlides(slides : NodeListOf<HTMLDivElement>, controls : Array<HTMLDivElement>) {
@@ -143,24 +152,24 @@ export class Carousel {
 
     private bindArrows(container : HTMLDivElement) {
         let svgIcons = this.makeCarouselArrows();
-        let leftArrow = <HTMLElement>container.querySelector("div.carousel-control-icon-left");
+        let leftArrow = <HTMLElement>container.querySelector(this.LEFT_ICON_SELECTOR);
         leftArrow.append(svgIcons.left);
-        leftArrow.onclick = (ev) => {if (!this.isAnimationPending) this.controlClickListener(this.iterator.peekPrev())};
-        let rightArrow = <HTMLElement>container.querySelector("div.carousel-control-icon-right");
+        leftArrow.onclick = (ev) => {this.controlClickListener(this.iterator.peekPrev())};
+        let rightArrow = <HTMLElement>container.querySelector(this.RIGHT_ICON_SELECTOR);
         rightArrow.append(svgIcons.right);
-        rightArrow.onclick = (ev) => {if (!this.isAnimationPending) this.controlClickListener(this.iterator.peekNext())};
+        rightArrow.onclick = (ev) => {this.controlClickListener(this.iterator.peekNext())};
     }
 
     private makeCarouselArrows() {
-        const namespaceUri = "http://www.w3.org/2000/svg";
+        const namespaceUri = this.SVG_NAMESPACE_URI;
         let leftIconSvg = document.createElementNS(namespaceUri, 'svg');
         let pathLeft = document.createElementNS(namespaceUri, "path");
-        pathLeft.setAttributeNS(null, "d", mdiArrowLeftDropCircle);
+        pathLeft.setAttributeNS(null, "d", this.CAROUSEL_ARROW_LEFT);
         leftIconSvg.append(pathLeft);
 
         let rightIconSvg = document.createElementNS(namespaceUri, 'svg');
         let pathRight = document.createElementNS(namespaceUri, "path");
-        pathRight.setAttributeNS(null, "d", mdiArrowRightDropCircle);
+        pathRight.setAttributeNS(null, "d",this.CAROUSEL_ARROW_RIGHT);
         rightIconSvg.append(pathRight);
 
         return {
@@ -237,6 +246,7 @@ export class Carousel {
 
     private setInterval() : void {
         if (this.needSetInterval)
+            clearInterval(this.tickInterval);
             this.tickInterval = setInterval(() => this.tick(), this.tickIntervalNumber);
     }
 
