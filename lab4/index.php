@@ -1,23 +1,37 @@
 <?php
 
-error_reporting(E_ALL);
+require_once ('vendor/autoload.php');
 
-require_once __DIR__."/src/core/autoload.php";
+use SimpleRouter\handlers\IRequestHandler;
+use SimpleRouter\Router;
+use SimpleRouter\request\Request;
 
 $router = Router::getInstance();
 
-class Handler {
-    public function handle($req) {
-        var_dump($req);
+$router->get("/", new class implements IRequestHandler {
+   public function handle(Request $req) {
+       if (!is_null($req->getRequestQueryValueByKey("id"))) {
+           switch ($req->getRequestQueryValueByKey("id")) {
+               case "form" : print(file_get_contents($_SERVER['DOCUMENT_ROOT']."/inc/table.inc.html")); break;
+               case "table" : print(file_get_contents($_SERVER['DOCUMENT_ROOT']."/inc/form.inc.html")); break;
+               default : print(file_get_contents($_SERVER['DOCUMENT_ROOT']."/inc/table.inc.html")); break;
+           }
+       } else {
+		   print(file_get_contents($_SERVER['DOCUMENT_ROOT']."/inc/index.inc.html"));
+	   }
+   }
+});
+
+$router->get("/form", new class implements IRequestHandler {
+    public function handle(Request $req) {
+        print(file_get_contents($_SERVER['DOCUMENT_ROOT']."/inc/form.inc.html"));
     }
-}
+});
 
-$router->get("/articles/{page?}/{category? : integer}/watch/", new Handler());
-$router->get("/news/{category : integer}/{page? : integer = 1}/{perPage? : integer = 10}", new Handler());
-//$router->get("/article/{name}", null);
-
-//$router->get("/services/{category}/{name}/{serviceId}/", null);
-//$router->get("/services/{name}/", null);
-//$router->get("/about/", null);
+$router->get("/table", new class implements IRequestHandler {
+    public function handle(Request $req) {
+        print(file_get_contents($_SERVER['DOCUMENT_ROOT']."/inc/table.inc.html"));
+    }
+});
 
 $router->handle();

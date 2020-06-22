@@ -1,0 +1,62 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "6403333b9564d132124e5aba1ae9c393",
+    "packages": [
+        {
+            "name": "aleksandr_bushuev/simple_router",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aleksandrBushuev2000/simple-router.git",
+                "reference": "236661c01969309bbd1533d3d0e4ed2ed8e32ba7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aleksandrBushuev2000/simple-router/zipball/236661c01969309bbd1533d3d0e4ed2ed8e32ba7",
+                "reference": "236661c01969309bbd1533d3d0e4ed2ed8e32ba7",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=7.4.0"
+            },
+            "require-dev": {
+                "phan/phan": "^3.0",
+                "phpunit/phpunit": "^9.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "SimpleRouter\\": "./src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP Routing Library without any dependency",
+            "homepage": "https://github.com/aleksandrBushuev2000/simple-router",
+            "support": {
+                "source": "https://github.com/aleksandrBushuev2000/simple-router/tree/master",
+                "issues": "https://github.com/aleksandrBushuev2000/simple-router/issues"
+            },
+            "time": "2020-06-10T23:18:18+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {
+        "aleksandr_bushuev/simple_router": 20
+    },
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=7.4.0"
+    },
+    "platform-dev": [],
+    "plugin-api-version": "1.1.0"
+}

@@ -1,0 +1,20 @@
+{
+    "name": "aleksandr-bushuev/lab4",
+    "description": "Implementation of lab4",
+    "type": "project",
+    "license": "MIT",
+    "repositories": [{
+        "type": "vcs",
+        "url": "http://github.com/aleksandrBushuev2000/simple-router.git"
+    }],
+    "authors": [
+        {
+            "name": "Aleksandr Bushuev",
+            "email": "aleksandr.bushuev2000@gmail.com"
+        }
+    ],
+    "require": {
+        "php" : ">=7.4.0",
+        "aleksandr_bushuev/simple_router" : "dev-master"
+    }
+}
