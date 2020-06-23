@@ -51,13 +51,15 @@ class CommentGateway implements ITableGateway {
                 "SELECT * FROM $table ORDER BY '$table.date' LIMIT ? OFFSET ?"
             );
 
+            $findQuery->bindParam(1, $perPage);
+            $findQuery->bindParam(2, $offset);
+
             $findQuery->setFetchMode(PDO::FETCH_ASSOC);
             while ($comment = $findQuery->fetch()) {
                 array_push($output, $comment);
             }
 
-            $findQuery->bindParam(1, $perPage);
-            $findQuery->bindParam(2, $offset);
+
         } catch (Throwable $exception) {
             throw new DataLayerException($exception->getMessage(), $exception->getCode(), $exception->getPrevious());
         }
@@ -65,8 +67,9 @@ class CommentGateway implements ITableGateway {
 
     public function getById(string $id) {
         $table = $this->tableName;
-        $sqlStatement = "SELECT * FROM ${table} WHERE id = ${id} ";
+        $sqlStatement = "SELECT * FROM ${table} WHERE id = ? ";
         $query = $this->connection->prepare($sqlStatement);
+        $query->bindParam(1, $id);
         $query->setFetchMode(PDO::FETCH_ASSOC);
         $result = $query->fetch();
         if ($result != false) {
@@ -96,6 +99,6 @@ class CommentGateway implements ITableGateway {
 
     public function count() : int {
         $table = $this->tableName;
-        return $this->connection->query("SELECT * FROM $table COUNT ");
+        return $this->connection->query("SELECT COUNT(*) FROM $table")->fetchColumn();
     }
 }
